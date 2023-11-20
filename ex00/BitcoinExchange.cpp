@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 17:02:13 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/11/19 20:48:17 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/11/20 19:06:47 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,17 +54,40 @@ void BitcoinExchange::readData()
 	dataFile.close();
 }
 
+int checkDigits(const std::string& str)
+{
+	for (size_t i = 0; i < str.length(); i++)
+	{
+		if (!std::isdigit(str[i]) && str != "value" && str[i] != '.'
+			&& str[i] != '-' && str[i] != '+')
+		{
+			std::cerr << "Error: invalid date format." << '\n';
+			return (1);
+		}
+	}
+	return (0);
+}
+
 int	checkRate(const std::string& rate)
 {
-	double nbr = std::atof(rate.c_str());
-	if (nbr < 0)
+	char *end;
+	double nbr = std::strtod(rate.c_str(), &end);
+	
+	if (rate == "value")
+		return 0;
+	else if (nbr < 0)
 	{
-		std::cout << "Error: not a positive number." << '\n';
+		std::cerr << "Error: not a positive number." << '\n';
 		return (1);
 	}
 	else if (nbr > MAX_RATE)
 	{
-		std::cout << "Error: too large a number." << '\n';
+		std::cerr << "Error: too large a number." << '\n';
+		return (1);
+	}
+	else if (end != rate.c_str() + rate.length())
+	{
+		std::cerr << "Error: invalid number." << '\n';
 		return (1);
 	}
 	return (0);
@@ -118,7 +141,7 @@ int checkRange(double day, double month, double year)
 	if (day > checkDay(month, year) || day < 1 || month > 12 || month < 1
 		|| checkYear(day, month, year))
 	{
-		std::cout << "Error: Invalid date value." << std::endl;
+		std::cerr << "Error: Invalid date value." << std::endl;
 		return 1;
 	}
 	return (0);
@@ -129,17 +152,17 @@ int	checkDate(const std::string& date)
 	if (date != "date")
 	{
 		size_t begin = date.find('-');
-		if (begin == std::string::npos)
+		if (begin == std::string::npos || begin != 4)
 		{
-			std::cout << "Error: invalid date format." << '\n';
+			std::cerr << "Error: invalid date format." << '\n';
 			return 1;
 		}
 		std::string year = date.substr(0, begin);
 		
 		size_t end = date.find('-', begin + 1);
-		if (end == std::string::npos)
+		if (end == std::string::npos || end != 7)
 		{
-			std::cout << "Error: invalid date format." << '\n';
+			std::cerr << "Error: invalid date format." << '\n';
 			return 1;
 		}
 		std::string month = date.substr(begin + 1, end - begin - 1);
@@ -147,10 +170,11 @@ int	checkDate(const std::string& date)
 		std::string day = date.substr(end + 1);
 		if (day.empty())
 		{
-			std::cout << "Error: invalid date format." << '\n';
+			std::cerr << "Error: invalid date format." << '\n';
 			return 1;
 		}
-		if (checkRange(std::atof(day.c_str()), std::atof(month.c_str()), std::atof(year.c_str())))
+		if (checkDigits(year) || checkDigits(month) || checkDigits(day) ||
+			checkRange(std::atof(day.c_str()), std::atof(month.c_str()), std::atof(year.c_str())))
 			return (1);
 	}
 	return (0);
@@ -168,17 +192,21 @@ BitcoinExchange::BitcoinExchange(const std::string& inputFile)
 	std::string line;
 	while (std::getline(file, line))
 	{
-
+		if (line.empty())
+		{
+			std::cerr << "Error: empty line." << '\n';
+			continue ;
+		}
 		size_t pos = line.find('|');
-		if (pos != std::string::npos)
+		if (pos != std::string::npos && (pos == 11 || pos == 5))
 		{
 			std::string date = line.substr(0, pos - 1);
 			std::string rate = line.substr(pos + 2);
 			
-			if (!checkRate(rate) && !checkDate(date) && date != "date" && rate != "value")
+			if (!checkDigits(rate) && !checkRate(rate) && !checkDate(date) && date != "date" && rate != "value")
 			{
 				//* success case
-				
+
 				std::map<std::string, double>::iterator it = this->data.lower_bound(date);
 				if (it->first != date)
 					it--;
@@ -187,6 +215,6 @@ BitcoinExchange::BitcoinExchange(const std::string& inputFile)
 			}
 		}
 		else
-			std::cout << "Error: bad input => " << line << '\n';
+			std::cerr << "Error: bad input => " << line << '\n';
 	}
 }
