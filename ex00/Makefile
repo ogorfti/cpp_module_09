@@ -6,13 +6,13 @@
 #    By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/11/17 16:52:49 by ogorfti           #+#    #+#              #
-#    Updated: 2023/11/19 19:01:42 by ogorfti          ###   ########.fr        #
+#    Updated: 2023/11/21 10:25:05 by ogorfti          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CXX = c++
 
-CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -fsanitize=address -g
+CXXFLAGS = -Wall -Wextra -Werror -std=c++98 #-fsanitize=address -g
 
 SRCS = $(wildcard *.cpp)
 

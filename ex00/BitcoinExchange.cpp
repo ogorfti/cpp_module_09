@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 17:02:13 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/11/20 19:06:47 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/11/21 11:54:27 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,34 +31,11 @@ BitcoinExchange& BitcoinExchange::operator=(const BitcoinExchange& other)
 
 BitcoinExchange::~BitcoinExchange() {}
 
-void BitcoinExchange::readData()
-{
-	std::ifstream dataFile("data.csv");
-
-	if (!dataFile.is_open())
-		throw std::runtime_error("Error: could not open database file.");
-	std::string line;
-	while (std::getline(dataFile, line))
-	{
-		size_t pos = line.find(',');
-		if (pos != std::string::npos && line.compare("date,exchange_rate"))
-		{
-			std::string date = line.substr(0, pos);
-			std::string tmp =  line.substr(pos + 1);
-			
-			double rate = std::atof(tmp.c_str());
-
-			data[date] = rate;
-		}
-	}
-	dataFile.close();
-}
-
-int checkDigits(const std::string& str)
+int checkDigits(const std::string& str, const std::string& fLine)
 {
 	for (size_t i = 0; i < str.length(); i++)
 	{
-		if (!std::isdigit(str[i]) && str != "value" && str[i] != '.'
+		if (!std::isdigit(str[i]) && str != fLine && str[i] != '.'
 			&& str[i] != '-' && str[i] != '+')
 		{
 			std::cerr << "Error: invalid date format." << '\n';
@@ -68,7 +45,7 @@ int checkDigits(const std::string& str)
 	return (0);
 }
 
-int	checkRate(const std::string& rate)
+int	checkRate(const std::string& rate, bool check)
 {
 	char *end;
 	double nbr = std::strtod(rate.c_str(), &end);
@@ -80,7 +57,7 @@ int	checkRate(const std::string& rate)
 		std::cerr << "Error: not a positive number." << '\n';
 		return (1);
 	}
-	else if (nbr > MAX_RATE)
+	else if (check && nbr > MAX_RATE)
 	{
 		std::cerr << "Error: too large a number." << '\n';
 		return (1);
@@ -104,7 +81,7 @@ int	checkYear(double _day, double _month, double _year)
 	
 	if (_year > year || (_year == year && (_month > month || (_month == month && _day > day))))
 		return 1;
-	else if (_year < 2009 || (_year == 2009 && (_month < 1 || (_month == 1 && _day < 3))))
+	else if (_year < 2009 || (_year == 2009 && (_month < 1 || (_month == 1 && _day < 2))))
 		return 1;
 	return (0);
 }
@@ -173,11 +150,51 @@ int	checkDate(const std::string& date)
 			std::cerr << "Error: invalid date format." << '\n';
 			return 1;
 		}
-		if (checkDigits(year) || checkDigits(month) || checkDigits(day) ||
+		if (checkDigits(year, "value") || checkDigits(month, "value") || checkDigits(day, "value") ||
 			checkRange(std::atof(day.c_str()), std::atof(month.c_str()), std::atof(year.c_str())))
 			return (1);
 	}
 	return (0);
+}
+
+void BitcoinExchange::readData()
+{
+	std::ifstream dataFile("data.csv");
+
+	if (!dataFile.is_open())
+		throw std::runtime_error("Error: could not open database file.");
+	else if (dataFile.peek() == std::ifstream::traits_type::eof())
+		throw std::runtime_error("Error: database file is empty.");
+	std::string line;
+	bool check = true;
+	while (std::getline(dataFile, line))
+	{
+		size_t pos = line.find(',');
+
+		if (check && line == "date,exchange_rate")
+		{
+			check = false;
+			continue;
+		}
+		else if (check)
+			throw std::runtime_error("Error: invalid format in the database file.");
+		else if (pos != std::string::npos && std::strcmp(line.c_str(), "date,exchange_rate"))
+		{
+			std::string date = line.substr(0, pos);
+			std::string tmp =  line.substr(pos + 1);
+			
+			if (!checkDate(date) && !checkDigits(tmp, "exchange_rate") && !checkRate(tmp, false))
+			{
+				double rate = std::atof(tmp.c_str());
+				data[date] = rate;
+			}
+			else
+				throw std::runtime_error("check the database!");
+		}
+		else
+			throw std::runtime_error("Error: invalid format in the database file.");
+	}
+	dataFile.close();
 }
 
 BitcoinExchange::BitcoinExchange(const std::string& inputFile)
@@ -203,7 +220,7 @@ BitcoinExchange::BitcoinExchange(const std::string& inputFile)
 			std::string date = line.substr(0, pos - 1);
 			std::string rate = line.substr(pos + 2);
 			
-			if (!checkDigits(rate) && !checkRate(rate) && !checkDate(date) && date != "date" && rate != "value")
+			if (!checkDigits(rate, "value") && !checkRate(rate, true) && !checkDate(date) && date != "date" && rate != "value")
 			{
 				//* success case
 
