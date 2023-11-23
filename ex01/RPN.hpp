@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 13:01:31 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/11/22 13:08:20 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/11/23 10:38:32 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ class RPN
 		RPN& operator=(const RPN&);
 		~RPN();
 
-		bool isOperands(char c);
+		bool isOperator(char c);
 		void calculateRPN(char c);
 		void runRPN();
 };

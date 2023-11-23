@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 15:45:46 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/11/22 13:16:56 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/11/23 10:38:44 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ RPN::RPN(const std::string& str)
 	_str = str;
 }
 
-bool RPN::isOperands(char c)
+bool RPN::isOperator(char c)
 {
 	if (c == '+' || c == '-' || c == '*' || c == '/' || c == '%')
 		return true;
@@ -102,7 +102,7 @@ void RPN::runRPN()
 			int nbr = std::atoi(tmp.c_str());
 			_stack.push(nbr);
 		}
-		else if (isOperands(tmp[0]) && tmp.size() == 1)
+		else if (isOperator(tmp[0]) && tmp.size() == 1)
 		{
 			if (_stack.size() < 2)
 				throw std::runtime_error("Insufficient operands on the stack");
