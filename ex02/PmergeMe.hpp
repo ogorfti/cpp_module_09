@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 10:37:38 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/11/27 10:40:33 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/11/27 11:35:33 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,13 @@
 class PmergeMe
 {
 	private:
-		std::string _str;
+		char **_av;
 	public:
 		PmergeMe();
-		PmergeMe(const std::string&);
 		PmergeMe(const PmergeMe&);
 		~PmergeMe();
 		PmergeMe &operator=(const PmergeMe&);
+		
+		PmergeMe(char **av);
+		void runFJMI();
 };
