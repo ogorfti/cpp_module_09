@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 10:37:38 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/12/08 15:44:45 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/12/09 17:19:09 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,11 @@
 
 #include <iostream>
 #include <vector>
+#include <algorithm>
+
 // #include <pa
+typedef std::pair<std::vector<int>, std::vector<int> > onePair;
+
 typedef std::vector < std::pair<std::vector<int>, std::vector<int> > > vecP;
 class PmergeMe
 {
@@ -25,6 +29,7 @@ class PmergeMe
 		// std::vector<std::vector<int> > _pairs 1;
 		
 		vecP _pairs;
+		vecP _test;
 		// std::vector<_pairs> _collection;
 	public:
 		PmergeMe();
