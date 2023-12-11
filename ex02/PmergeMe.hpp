@@ -16,21 +16,20 @@
 #include <vector>
 #include <algorithm>
 
-// #include <pa
 typedef std::pair<std::vector<int>, std::vector<int> > onePair;
 
-typedef std::vector < std::pair<std::vector<int>, std::vector<int> > > vecP;
+typedef std::vector < onePair > vecP;
+
 class PmergeMe
 {
 	private:
 		char **_av;
 		std::vector <int> remain;
 		std::vector <int> _v;
-		// std::vector<std::vector<int> > _pairs 1;
 		
 		vecP _pairs;
-		vecP _test;
-		// std::vector<_pairs> _collection;
+		bool done;
+		std::vector< std::vector<int> > _collection;
 	public:
 		PmergeMe();
 		PmergeMe(const PmergeMe&);
@@ -41,6 +40,8 @@ class PmergeMe
 		void checkInput();
 		void recursion();
 		void initPairs();
+		void backToMonkey();
+
 		void runFJMI();
 };
 

@@ -17,6 +17,7 @@ PmergeMe::PmergeMe() {}
 PmergeMe::PmergeMe(char **av)
 {
 	_av = av;
+	done = false;
 }
 
 PmergeMe::PmergeMe(const PmergeMe& other)
@@ -58,11 +59,6 @@ void PmergeMe::checkInput()
 	}
 }
 
-bool comparePairs(const onePair& p1, const onePair& p2)
-{
-	return p1.second.back() < p2.second.back();
-}
-
 void PmergeMe::initPairs()
 {
 	if (_v.size() % 2 != 0)
@@ -79,24 +75,23 @@ void PmergeMe::initPairs()
 		
 		_pairs.push_back(std::make_pair(f, s));
 	}
-	// std::sort(_pairs.begin(), _pairs.end(), comparePairs);
 }
 
 void printPairs(vecP _pairs)
 {
 	for (size_t i = 0; i < _pairs.size(); i++)
 	{
-    	std::cout << "[ ";
-    	for (size_t j = 0; j < _pairs[i].first.size(); j++)
+		std::cout << "[ ";
+		for (size_t j = 0; j < _pairs[i].first.size(); j++)
 		{
-        	std::cout << _pairs[i].first[j] << " ";
-    	}
-    	std::cout << " : ";
-    	for (size_t j = 0; j < _pairs[i].second.size(); j++)
+			std::cout << _pairs[i].first[j] << " ";
+		}
+		std::cout << " : ";
+		for (size_t j = 0; j < _pairs[i].second.size(); j++)
 		{
-        std::cout << _pairs[i].second[j] << " ";
-    	}
-   		std::cout << " ]" << std::endl;
+		std::cout << _pairs[i].second[j] << " ";
+		}
+		std::cout << " ]" << std::endl;
 	}
 }
 
@@ -126,13 +121,49 @@ onePair mergePairs(onePair& p1, onePair& p2)
 	return std::make_pair(f, s);
 }
 
+void PmergeMe::backToMonkey()
+{
+	for (size_t i = 0; i < _pairs.size(); i++)
+	{
+		std::vector<int> tmp;
+		for (std::vector<int>::iterator it = _pairs[i].first.begin(); it != _pairs[i].first.end(); it++)
+		{
+			tmp.push_back(*it);
+		}
+		for (std::vector<int>::iterator it = _pairs[i].second.begin(); it != _pairs[i].second.end(); it++)
+		{
+			tmp.push_back(*it);
+		}
+		_collection.push_back(tmp);
+	}
+}
+
+std::vector<int> pairToVec(const onePair& pair)
+{
+    std::vector<int> vec;
+
+    vec.insert(vec.end(), pair.first.begin(), pair.first.end());
+    vec.insert(vec.end(), pair.second.begin(), pair.second.end());
+
+    return vec;
+}
+
+struct 	Compare
+{
+    bool operator()(const std::vector<int>& lhs, const std::vector<int>& rhs) const
+	{
+        return lhs.back() < rhs.back();
+    }
+};
+
 void PmergeMe::recursion()
 {
+	onePair tmp;
+
 	if (_pairs.size() > 1)
 	{
 		vecP mergedPairs;
 
-		std::sort(_pairs.begin(), _pairs.end(), comparePairs);
 		for (size_t i = 0; i < _pairs.size(); i+=2)
 		{
 			if (i + 1 < _pairs.size())
@@ -140,28 +171,77 @@ void PmergeMe::recursion()
 				printPair(_pairs[i]);
 				printPair(_pairs[i+1]);
 				std::cout << "--------------\n";
+				if (_pairs[i].second.back() > _pairs[i+1].second.back())
+					std::swap(_pairs[i], _pairs[i+1]);
 				mergedPairs.push_back(mergePairs(_pairs[i], _pairs[i+1]));
 			}
 			else
-			{
-				// std::cout << "PEND!!" << '\n'; 
-				// std::cout << "--- PEND START ---" << '\n'; 
-				// _test = _pairs[i];
-				_test.push_back(_pairs[i]);
-				// printPair(_test);
-				// std::cout << "--- PEND END ---" << '\n'; 
-			}
+				tmp = _pairs[i];
 		}
 		_pairs = mergedPairs;
 		printPairs(_pairs);
 		recursion();
 	}
+	else if (!done)
+	{
+		done = true;
+		backToMonkey();
+		std::cout << "DONE FORWARD!!" << '\n';
+	}
 	
-	std::cout << "reverse recursion start" << std::endl;
-	// std::cout << "PEND!!" << '\n';
-	// printPairs(_test);
-	// if (_test.first)
-		
+	std::vector<std::vector<int> > pend;
+	std::vector<std::vector<int> > mainchain;
+	for (size_t i = 0; i < _collection.size(); i++)
+	{
+		std::vector<int> oneV = _collection[i];
+
+
+		std::vector<int> f,s;
+
+		for (size_t i = 0; i < oneV.size() / 2; i++)
+		{
+			f.push_back(oneV[i]);
+		}
+		for (size_t i = oneV.size() / 2; i < oneV.size(); i++)
+		{
+			s.push_back(oneV[i]);
+		}
+		pend.push_back(f);
+		// pend.push_back(s);
+		mainchain.push_back(s);
+	}
+	if (!tmp.first.empty())
+	{
+		std::vector<int> here = pairToVec(tmp);
+		std::vector<int> f,s;
+
+		for (size_t i = 0; i < here.size() / 2; i++)
+		{
+			f.push_back(here[i]);
+		}
+		for (size_t i = here.size() / 2; i < here.size(); i++)
+		{
+			s.push_back(here[i]);
+		}
+		pend.push_back(f);
+		pend.push_back(s);
+
+		// std::cout << "here\n";
+		// pend.push_back(pairToVec(tmp));
+	}
+
+	for (size_t i = 0; i < pend.size(); i++)
+	{
+		std::vector<int> x = pend[i];
+
+		Compare comparator;
+		std::vector<std::vector<int> >::iterator it = std::lower_bound(mainchain.begin(), mainchain.end(), x, comparator);
+
+		mainchain.insert(it, x);
+	}
+	_collection = mainchain;
+	std::cout << "PEND!!" << '\n';
+	printPair(tmp);
 }
 
 //11 1 4 0 21 10 9 5 7 26 23 2
@@ -177,6 +257,16 @@ void PmergeMe::runFJMI()
 	// {
 	// 	std::cout << *it << '\n';
 	// }
+	for (std::vector<std::vector<int> >::iterator it = _collection.begin(); it != _collection.end(); it++)
+	{
+		std::vector<int> tmp = *it;
+
+		for (std::vector<int>::iterator it = tmp.begin(); it != tmp.end(); it++)
+		{
+			std::cout << *it << '\n';
+		}
+		std::cout << "***\n";
+	}
 
 	
 	// printPairs(_pairs);
