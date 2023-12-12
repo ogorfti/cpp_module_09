@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 10:37:38 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/12/09 17:19:09 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/12/12 17:36:52 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,34 +38,14 @@ class PmergeMe
 		
 		PmergeMe(char **av);
 		void checkInput();
-		void recursion();
+		void recursion(size_t index);
 		void initPairs();
-		void backToMonkey();
+		void pairToVec(std::vector<onePair>& pairs);
 
 		void runFJMI();
 };
 
-/*
-4 6 9 2 3
-
-[4 6] [9 2] | Remain = 3
-
-sort
-[4 6] [2 9] [ 8 11 ] [3 14] - -
-
-[ 4 6 2 9 ] [8 11 3 14] --
-
-[4 6 2 9 8 11 3 14]
-
-
-func()
-{
-	if (size > 1)
-	{
-		...
-		func();
-	}
-	...
-}	
-
-*/
+void printPairs(vecP _pairs);
+void printPair(const std::pair<std::vector<int>, std::vector<int> >& pair);
+void printVector(const std::vector<int>& vec);
+void printVectorOfVectors(const std::vector<std::vector<int> >& vec);
