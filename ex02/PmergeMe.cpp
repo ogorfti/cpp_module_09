@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 10:40:59 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/12/12 17:42:07 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/12/15 19:52:08 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,10 +73,30 @@ void PmergeMe::pairToVec(std::vector<onePair>& pairs)
 	}
 }
 
+
 bool compare(const std::vector<int>& lhs, const std::vector<int>& rhs) 
 {
 	count++;
 	return lhs.back() < rhs.back();
+}
+
+std::vector<int> jacobstall(int n)
+{
+	std::vector<int> v;
+	v.push_back(0);
+	v.push_back(1);
+	int tmp;
+
+
+	int i = 2;
+	tmp = 0;
+	while (tmp < n)
+	{
+		tmp = v[i - 1] + 2 * v[i - 2];
+		v.push_back(tmp);
+		i++;
+	}
+	return v;
 }
 
 void PmergeMe::recursion(size_t index)
@@ -148,21 +168,99 @@ void PmergeMe::recursion(size_t index)
 		printVector(tmp);
 		pend.push_back(tmp);
 	}
+	/*
+	jacob 0 2 1 3
 
+	
+	1 2. 5 6. 8 9. 7 10
+	
+	main: 2 6 9 10
+	pend: 1 5 8 7
+
+	arr = 0 1 2 3
+	  = 1 2 3 4
+	  = 1 2 3 5
+	
+	main: 1 2 6 9 10
+	pend: [1] 5 8 7
+	
+	
+	
+	main: 1 2 6 8 9 10
+	pend: [1] 5 [8] 7
+	*/
+
+
+	std::vector <int> arr;
 	for (size_t i = 0; i < pend.size(); i++)
 	{
-		std::vector<int> x = pend[i];
-		
-		std::vector<std::vector<int> >::iterator it = std::lower_bound(mainchain.begin(), mainchain.end(), x, compare);
-
-		mainchain.insert(it, x);
+		arr.push_back(i);
+		// std::cout << "jaa------> :" << arr[i] << '\n';
 	}
+	
+	std::vector<int> v = jacobstall(pend.size());
+	size_t prev = 0;
+	for (size_t i = 2; i < v.size(); i++)
+	{
+		size_t index = v[i];
+		while (index > prev)
+		{
+			// std::cout << index << '\n';
+			// std::vector< std::vector<int> > copy = mainchain;
+	
+			if (index - 1 < pend.size())
+			{
+				std::vector<int> x = pend[index - 1];
+				
+				std::vector<std::vector<int> >::iterator it;
+				// std::cout << "jaa------> :" << arr[index - 1] << '\n';
+				if (index - 1 == 0)
+					mainchain.insert(mainchain.begin(), x);
+				else
+				{
+					it = std::lower_bound(mainchain.begin(), mainchain.end(), x, compare);
+					mainchain.insert(it, x);
+				}
+				/*
+					update the arr
+				*/
+				// for (size_t i = 0; i < copy.size(); i++)
+				// {
+				// 	std::vector<int> vec1 = mainchain[i];
+				// 	std::vector<int> vec2 = copy[i];
+
+				// 	if (vec1.back() != vec2.back())
+				// 	{
+				// 		for (size_t j = 0; j < arr.size(); j++)
+				// 		{
+				// 			arr[j] += 1;
+				// 		}
+				// 		break;
+				// 	}
+				// }
+				// for (size_t i = 0; i < arr.size(); i++)
+				// {
+				// 	std::cout << "jaa------> :" << arr[i] << '\n';
+				// }
+				
+			}		
+			index--;
+		}
+		prev = v[i];
+	}
+
+
 	_collection = mainchain;
 	printVectorOfVectors(_collection);
 	std::cout << "REVERSE!!" << '\n';
 }
 
-//11 1 4 0 21 10 9 5 7 26 23 2
+//11 1 4 0 21
+/* 3 2
+1- generate sequence untill J(n) >= pend.size() return vec <int> (1 3 5 11 ...)
+2- the first element in the pend should always push  before comaparaison
+3- generate index based on the vec and the pend size
+*/
 void PmergeMe::runFJMI()
 {
 	std::cout << "<---- FJMI ---->" << std::endl;
