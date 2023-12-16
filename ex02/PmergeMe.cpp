@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 10:40:59 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/12/15 19:52:08 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/12/16 15:58:59 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,7 @@ void PmergeMe::recursion(size_t index)
 
 	std::vector<std::vector<int> > mainchain;
 	std::vector<std::vector<int> > pend;
+	std::vector<onePair> hold;
 
 	for (size_t i = 0; i < _collection.size(); i++)
 	{
@@ -161,6 +162,13 @@ void PmergeMe::recursion(size_t index)
 	
 		pend.push_back(f);
 		mainchain.push_back(s);
+
+		onePair test(f, s);
+
+		hold.push_back(test);
+		// onePair get;
+		// get.first = 
+		// get.first.insert(f.begin, f.end);
 	}
 	if (!tmp.empty())
 	{
@@ -168,83 +176,74 @@ void PmergeMe::recursion(size_t index)
 		printVector(tmp);
 		pend.push_back(tmp);
 	}
+
 	/*
-	jacob 0 2 1 3
-
-	
-	1 2. 5 6. 8 9. 7 10
-	
-	main: 2 6 9 10
-	pend: 1 5 8 7
-
-	arr = 0 1 2 3
-	  = 1 2 3 4
-	  = 1 2 3 5
-	
-	main: 1 2 6 9 10
-	pend: [1] 5 8 7
-	
-	
-	
-	main: 1 2 6 8 9 10
-	pend: [1] 5 [8] 7
+		vec < pair <pend, main> >
+		vec < pair <vec, vec> >
+		find his pair vec
+		and find it in mainchain and get the index
 	*/
 
 
-	std::vector <int> arr;
-	for (size_t i = 0; i < pend.size(); i++)
-	{
-		arr.push_back(i);
-		// std::cout << "jaa------> :" << arr[i] << '\n';
-	}
-	
 	std::vector<int> v = jacobstall(pend.size());
 	size_t prev = 0;
+	// 0 1 1 3 5
+	// [] []
+		int kk = 0;
 	for (size_t i = 2; i < v.size(); i++)
 	{
 		size_t index = v[i];
 		while (index > prev)
 		{
-			// std::cout << index << '\n';
-			// std::vector< std::vector<int> > copy = mainchain;
-	
 			if (index - 1 < pend.size())
 			{
 				std::vector<int> x = pend[index - 1];
 				
 				std::vector<std::vector<int> >::iterator it;
-				// std::cout << "jaa------> :" << arr[index - 1] << '\n';
 				if (index - 1 == 0)
+				{
 					mainchain.insert(mainchain.begin(), x);
+					// std::cout << "9999999999999999"  << kk << '\n';
+					kk++;
+				}
 				else
 				{
-					it = std::lower_bound(mainchain.begin(), mainchain.end(), x, compare);
-					mainchain.insert(it, x);
-				}
-				/*
-					update the arr
-				*/
-				// for (size_t i = 0; i < copy.size(); i++)
-				// {
-				// 	std::vector<int> vec1 = mainchain[i];
-				// 	std::vector<int> vec2 = copy[i];
+					// std::vector<int> tmp2;
+					// for (std::vector< onePair >::iterator it = hold.begin(); it != hold.end(); it++)
+					// {
+					// 	std::vector<int> tmp1 = it->first;
+					// 	if (tmp1.back() == x.back())
+					// 	{
+					// 		std::cout << "Morrrras\n"; 
+					// 		tmp2 = it->second;
+					// 	}
+					// }
+					// std::vector< std::vector<int> >::iterator ite = mainchain.begin();
+					// for (; ite != mainchain.end(); ite++)
+					// {
+					// 	std::vector<int> vec = *ite;
+					// 	if (tmp2.empty()) {
+					// 		std::cout << "hell\n";
+					// 		ite = mainchain.end();
+					// 		break;
+					// 	}
+					// 	if (vec.back() == tmp2.back())
+					// 		break;
+					// }
+					// 	std::cout << "########\n";
+					// if (index+kk-1 >= mainchain.size() - 1)
+					// 	it = std::lower_bound(mainchain.begin(), mainchain.end(), x, compare);
+					// else
+					it = std::lower_bound(mainchain.begin(), mainchain.begin() + index + kk - 1, x, compare);
 
-				// 	if (vec1.back() != vec2.back())
-				// 	{
-				// 		for (size_t j = 0; j < arr.size(); j++)
-				// 		{
-				// 			arr[j] += 1;
-				// 		}
-				// 		break;
-				// 	}
-				// }
-				// for (size_t i = 0; i < arr.size(); i++)
-				// {
-				// 	std::cout << "jaa------> :" << arr[i] << '\n';
-				// }
-				
-			}		
+					// std::cout << "main: " << mainchain.size() << "  gggg: " << kk << '\n';
+					mainchain.insert(it, x);
+					kk++;
+				}			
 			index--;
+			}
+			else
+				index = pend.size();
 		}
 		prev = v[i];
 	}
@@ -256,7 +255,7 @@ void PmergeMe::recursion(size_t index)
 }
 
 //11 1 4 0 21
-/* 3 2
+/* 0 1 3 5
 1- generate sequence untill J(n) >= pend.size() return vec <int> (1 3 5 11 ...)
 2- the first element in the pend should always push  before comaparaison
 3- generate index based on the vec and the pend size
