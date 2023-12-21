@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/27 10:40:59 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/12/19 12:01:30 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/12/21 10:04:51 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,13 @@ PmergeMe::PmergeMe(const PmergeMe& other)
 PmergeMe& PmergeMe::operator=(const PmergeMe& other)
 {
 	if (this != &other)
+	{
 		_av = other._av;
+		_v = other._v;
+		_v_deq = other._v_deq;
+		remain = other.remain;
+		remain_deq = other.remain_deq;	
+	}
 	return (*this);
 }
 

@@ -6,7 +6,7 @@
 /*   By: ogorfti <ogorfti@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/17 17:02:13 by ogorfti           #+#    #+#             */
-/*   Updated: 2023/11/21 11:54:27 by ogorfti          ###   ########.fr       */
+/*   Updated: 2023/12/21 10:10:39 by ogorfti          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ int	checkYear(double _day, double _month, double _year)
 	
 	if (_year > year || (_year == year && (_month > month || (_month == month && _day > day))))
 		return 1;
-	else if (_year < 2009 || (_year == 2009 && (_month < 1 || (_month == 1 && _day < 2))))
+	else if (_year < 2009 || (_year == 2009 && (_month < 1 || (_month == 1 && _day < 3))))
 		return 1;
 	return (0);
 }
